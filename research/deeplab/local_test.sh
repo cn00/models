@@ -27,17 +27,19 @@
 set -e
 
 # Move one-level up to tensorflow/models/research directory.
-cd ..
+#cd ..
 
 # Update PYTHONPATH.
-export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim:/slim:/usr/lib64/python3.6/site-packages
+echo "$PYTHONPATH"
 
+python=python3
 # Set up the working environment.
 CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 
 # Run model_test first to make sure the PYTHONPATH is correctly set.
-python "${WORK_DIR}"/model_test.py -v
+${python} "${WORK_DIR}"/model_test.py -v
 
 # Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
 DATASET_DIR="datasets"
@@ -61,19 +63,28 @@ mkdir -p "${EVAL_LOGDIR}"
 mkdir -p "${VIS_LOGDIR}"
 mkdir -p "${EXPORT_DIR}"
 
+
+
 # Copy locally the trained checkpoint as the initial checkpoint.
 TF_INIT_ROOT="http://download.tensorflow.org/models"
 TF_INIT_CKPT="deeplabv3_pascal_train_aug_2018_01_04.tar.gz"
-cd "${INIT_FOLDER}"
-wget -nd -c "${TF_INIT_ROOT}/${TF_INIT_CKPT}"
-tar -xf "${TF_INIT_CKPT}"
+deeplabv3_pascal()
+{
+  cd "${INIT_FOLDER}"
+  if [ ! -f "${TF_INIT_CKPT}" ]; then
+    wget -nd -c "${TF_INIT_ROOT}/${TF_INIT_CKPT}"
+    tar -xf "${TF_INIT_CKPT}"
+  fi
+  echo "deeplabv3_pascal ok"
+}
+deeplabv3_pascal
 cd "${CURRENT_DIR}"
 
 PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
 
 # Train 10 iterations.
 NUM_ITERATIONS=10
-python "${WORK_DIR}"/train.py \
+${python} "${WORK_DIR}"/train.py \
   --logtostderr \
   --train_split="trainval" \
   --model_variant="xception_65" \
@@ -94,7 +105,7 @@ python "${WORK_DIR}"/train.py \
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
 # Using the provided checkpoint, one should expect mIOU=82.20%.
-python "${WORK_DIR}"/eval.py \
+${python} "${WORK_DIR}"/eval.py \
   --logtostderr \
   --eval_split="val" \
   --model_variant="xception_65" \
@@ -111,7 +122,7 @@ python "${WORK_DIR}"/eval.py \
   --max_number_of_evaluations=1
 
 # Visualize the results.
-python "${WORK_DIR}"/vis.py \
+${python} "${WORK_DIR}"/vis.py \
   --logtostderr \
   --vis_split="val" \
   --model_variant="xception_65" \
@@ -131,7 +142,7 @@ python "${WORK_DIR}"/vis.py \
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
 EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
-python "${WORK_DIR}"/export_model.py \
+${python} "${WORK_DIR}"/export_model.py \
   --logtostderr \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \

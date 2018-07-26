@@ -30,14 +30,15 @@ set -e
 cd ..
 
 # Update PYTHONPATH.
-export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`:/slim:/usr/lib64/python3.6/site-packages
 
+python=python3
 # Set up the working environment.
 CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 
 # Run model_test first to make sure the PYTHONPATH is correctly set.
-python "${WORK_DIR}"/model_test.py -v
+${python} "${WORK_DIR}"/model_test.py -v
 
 # Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
 DATASET_DIR="datasets"
@@ -74,7 +75,7 @@ PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
 
 # Train 10 iterations.
 NUM_ITERATIONS=10
-python "${WORK_DIR}"/train.py \
+${python} "${WORK_DIR}"/train.py \
   --logtostderr \
   --train_split="trainval" \
   --model_variant="mobilenet_v2" \
@@ -91,7 +92,7 @@ python "${WORK_DIR}"/train.py \
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
 # Using the provided checkpoint, one should expect mIOU=75.34%.
-python "${WORK_DIR}"/eval.py \
+${python} "${WORK_DIR}"/eval.py \
   --logtostderr \
   --eval_split="val" \
   --model_variant="mobilenet_v2" \
@@ -103,7 +104,7 @@ python "${WORK_DIR}"/eval.py \
   --max_number_of_evaluations=1
 
 # Visualize the results.
-python "${WORK_DIR}"/vis.py \
+${python} "${WORK_DIR}"/vis.py \
   --logtostderr \
   --vis_split="val" \
   --model_variant="mobilenet_v2" \
@@ -118,7 +119,7 @@ python "${WORK_DIR}"/vis.py \
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
 EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
-python "${WORK_DIR}"/export_model.py \
+${python} "${WORK_DIR}"/export_model.py \
   --logtostderr \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \

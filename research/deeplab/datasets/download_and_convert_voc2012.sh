@@ -48,9 +48,10 @@ download_and_uncompress() {
   if [ ! -f "${FILENAME}" ]; then
     echo "Downloading ${FILENAME} to ${WORK_DIR}"
     wget -nd -c "${BASE_URL}/${FILENAME}"
+    tar -xf "${FILENAME}"
+    echo "Uncompressing ${FILENAME}"
   fi
-  echo "Uncompressing ${FILENAME}"
-  tar -xf "${FILENAME}"
+  echo "download_and_uncompress ${FILENAME}"
 }
 
 # Download the images.
