@@ -106,4 +106,5 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-  tf.app.run()
+  tf.train.get_or_create_global_step()
+  #tf.app.run()

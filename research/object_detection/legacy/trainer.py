@@ -262,7 +262,7 @@ def train(create_tensor_dict_fn,
 
     # Place the global step on the device storing the variables.
     with tf.device(deploy_config.variables_device()):
-      global_step = slim.create_global_step()
+      global_step = tf.train.create_global_step()
 
     if num_clones != 1 and train_config.sync_replicas:
       raise ValueError('In Synchronous SGD mode num_clones must ',

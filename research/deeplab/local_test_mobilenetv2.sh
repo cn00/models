@@ -27,10 +27,11 @@
 set -e
 
 # Move one-level up to tensorflow/models/research directory.
-cd ..
+# cd ..
 
 # Update PYTHONPATH.
-export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`:/slim:/usr/lib64/python3.6/site-packages
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim:/slim:/usr/lib64/python3.6/site-packages
+echo "$PYTHONPATH"
 
 python=python3
 # Set up the working environment.
